@@ -14,6 +14,13 @@
 #pragma tabsize 0
 #pragma semicolon 1
 
+new szSound[] = {"duel/start.wav"};
+new szCountSounds[3][] = {
+	"fvox/one.wav",
+	"fvox/two.wav",
+	"fvox/three.wav"
+};
+
 new bool:duelStarted;
 new gTerroId;
 new gCtId;
@@ -27,6 +34,8 @@ new g_msgsync;
 new duelRemainingTime;
 new duelStartTime;
 
+new g_fwDuelWon;
+
 public plugin_init(){
 	register_plugin(PLUGIN,VERSION,AUTHOR);
 
@@ -36,9 +45,13 @@ public plugin_init(){
 
 	RegisterHam(Ham_Player_Jump, "player", "BlockJump");
 
+	register_clcmd("say /shop", "BlockShop");
+
 	RegisterHam( Ham_Touch, "armoury_entity", "BlockPickup" ); 
 
 	RegisterHam( Ham_Touch, "weaponbox", "BlockPickup" );
+
+	RegisterHam(Ham_Killed, "player", "player_killed");
 
 	gCvarDuelTime = register_cvar("duel_time", "60.0");
 
@@ -48,10 +61,18 @@ public plugin_init(){
 
 	register_event("CurWeapon","Event_CurWeapon","b");
 
+	g_fwDuelWon = CreateMultiForward( "player_won_duel", ET_IGNORE, FP_CELL );
+
 	duelTime = float:get_pcvar_float(gCvarDuelTime);
 
 	g_msgsync = CreateHudSyncObj();
 
+}
+
+public plugin_precache(){
+	precache_sound(szSound);
+	for(new i;i<3;i++)
+		precache_sound(szCountSounds[i]);
 }
 
 public Event_RoundStart(){
@@ -79,16 +100,34 @@ public Event_CurWeapon(id){
 			switch(currWeapon){
 				case CSW_DEAGLE:	ammoCount = 1;
 				case CSW_MP5NAVY:	ammoCount = 3;
+				case CSW_FAMAS:		ammoCount = 3;
+				case CSW_P90:		ammoCount = 3;
+				case CSW_AUG:		ammoCount = 3;
 				case CSW_AK47:		ammoCount = 3;
 				case CSW_M4A1:		ammoCount = 3;
-				case CSW_SCOUT:		ammoCount = 1;
-				case CSW_AWP:		ammoCount = 1;
+				case CSW_M3:		ammoCount = 3;
+				case CSW_HEGRENADE:	ammoCount = 1;
+				case CSW_SCOUT:		ammoCount = 255;
+				case CSW_AWP:		ammoCount = 255;
 			}
 			SetAmmo(id, currWeapon, ammoCount);
 		}
 	}
 	return PLUGIN_CONTINUE;
 }
+
+public player_killed(victim, attacker){
+	if(!is_user_connected(attacker)) return HAM_IGNORED;
+
+	new iReturn;
+
+	if(duelStarted){
+		ExecuteForward( g_fwDuelWon, iReturn, attacker );
+	}
+
+	return HAM_IGNORED;
+}
+
 
 public SetAmmo(id, weaponName, amount){
 
@@ -124,6 +163,14 @@ public BlockJump(id){
 	}
 	return HAM_IGNORED;
 }
+
+public BlockShop(id){
+	if(duelStarted && is_user_alive(id)){
+		return PLUGIN_HANDLED;
+	}
+
+	return PLUGIN_CONTINUE;
+}
 	
 public Menu(id){
 	new players[32];
@@ -138,17 +185,17 @@ public Menu(id){
 	gTerroId = players[0];
 
 	if(cs_get_user_team(id) != CS_TEAM_CT){
-		chat_color(id, "!g(Deathrun Evict)!n Poti face duel doar daca esti !gCT!n.");
+		chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
 		return PLUGIN_HANDLED;
 	}
 	
 	if(CTAlive != 1 || gCtId != id ){
-		chat_color(id, "!g(Deathrun Evict)!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
+		chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
 	if(TAlive == 0){
-		chat_color(id, "!g(Deathrun Evict)!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
+		chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
@@ -158,25 +205,56 @@ public Menu(id){
 	menu_additem( menu, "\rDeagle", "", 0 );
 	menu_additem( menu, "\rMP5", "", 0 );
 	menu_additem( menu, "\rAK47", "", 0 );
-	menu_additem( menu, "\rM4A1", "", 0 );
+	menu_additem( menu, "\rP90", "", 0 );
+	menu_additem( menu, "\rAUG", "", 0 );
 	menu_additem( menu, "\rScout", "", 0 );
+	menu_additem( menu, "\rM4A1", "", 0 );
+	menu_additem( menu, "\rFamas", "", 0 );
+	menu_additem( menu, "\rShotgun", "", 0 );
+	menu_additem( menu, "\rGrenade", "", 0 );
 	menu_additem( menu, "\rAWP", "", 0 );
 	
 	menu_setprop( menu, MPROP_EXIT, MEXIT_ALL );
 
-	menu_setprop(menu, MPROP_EXITNAME, "EXIT^n^n\rwww.evict.ro");
+	menu_setprop(menu, MPROP_EXITNAME, "EXIT^n^n\r");
 
 	menu_setprop(menu, MPROP_NUMBER_COLOR, "\d");
 	
 	menu_display( id, menu, 0 );
 
 	return 0;
-   
+
 }
+
 
 public menu_handler( id, menu, item ){
 	if(!is_user_alive(id))
 		return PLUGIN_HANDLED;
+	new players[32];
+	new players2[32];
+	new CTAlive;
+	new TAlive;
+
+	get_players(players, TAlive, "ace", "TERRORIST");
+	get_players(players2, CTAlive, "ace", "CT");
+
+	gCtId = players2[0];
+	gTerroId = players[0];
+
+	if(cs_get_user_team(id) != CS_TEAM_CT){
+		chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
+		return PLUGIN_HANDLED;
+	}
+	
+	if(CTAlive != 1 || gCtId != id ){
+		chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
+		return PLUGIN_HANDLED;
+	}
+
+	if(TAlive == 0){
+		chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
+		return PLUGIN_HANDLED;
+	}
 	if ( item == MENU_EXIT )
 	{
 		menu_destroy( menu );
@@ -191,15 +269,21 @@ public menu_handler( id, menu, item ){
 		case 1: weaponName = "weapon_deagle";
 		case 2: weaponName = "weapon_mp5navy";
 		case 3: weaponName = "weapon_ak47";
-		case 4: weaponName = "weapon_m4a1";
-		case 5: weaponName = "weapon_scout";
-		case 6: weaponName = "weapon_awp";
+		case 4: weaponName = "weapon_p90";
+		case 5: weaponName = "weapon_aug";
+		case 6: weaponName = "weapon_scout";
+		case 7: weaponName = "weapon_m4a1";
+		case 8: weaponName = "weapon_famas";
+		case 9: weaponName = "weapon_m3";
+		case 10: weaponName = "weapon_hegrenade";
+		case 11: weaponName = "weapon_awp";
 	}
 	GiveWeapon(id, weaponName);
 	GiveWeapon(gTerroId, weaponName);
 	menu_destroy( menu );
 	return PLUGIN_HANDLED;
 }
+
 
 public GiveWeapon(id, weaponName[32]){
 	new weaponId = get_weaponid(weaponName);
@@ -239,11 +323,18 @@ public DuelStartHud(){
 		set_user_godmode(gCtId, 0);
 		set_user_godmode(gTerroId, 0);
 		remove_task(6989);
+		play_sound(0, szSound);
+
+		return PLUGIN_CONTINUE;
 	}
-	set_hudmessage(0, 64, 255, -1.0, 0.2, 2, 1.0, 1.0, 0.01, 0.01, -1);
+
+	set_hudmessage(0, 64, 255, -1.0, 0.3, 2, 1.0, 1.0, 0.01, 0.01, -1);
 	ShowSyncHudMsg(0, g_msgsync, "Duelul incepe in : %d", duelStartTime);
 	
+	play_sound(0, szCountSounds[duelStartTime-1]);
 	duelStartTime-=1;
+
+	return PLUGIN_CONTINUE;
 	
 }
 
@@ -254,7 +345,7 @@ public DuelHUD(){
 		remove_task(1337);
 	}
 		
-	set_hudmessage(200, 0, 0, -1.0, 0.2, 1, 1.0, 1.0, 0.01, 0.01, -1);
+	set_hudmessage(200, 0, 0, -1.0, 0.3, 1, 1.0, 1.0, 0.01, 0.01, -1);
 	ShowSyncHudMsg(0, g_msgsync, "Timp ramas pentru duel : %d", duelRemainingTime);
 	duelRemainingTime-=1;
 }
@@ -302,4 +393,29 @@ stock chat_color(const id, const input[], any:...){
 			write_string(sMsg);
 			message_end();
 		}
+}
+
+play_sound(id, sound[])
+{
+	send_audio(id, sound, PITCH_NORM);
+}
+
+stock send_audio(id, audio[], pitch)
+{
+	new audio_track[128];
+	format(audio_track, 127, "%s", audio);
+	if(containi(audio, "sound/") == -1)
+		format(audio_track, 127, "sound/%s", audio);
+	
+	static msg_send_audio;
+	
+	if(!msg_send_audio) {
+		msg_send_audio = get_user_msgid("SendAudio");
+	}
+
+	message_begin( id ? MSG_ONE_UNRELIABLE : MSG_BROADCAST, msg_send_audio, _, id);
+	write_byte(id);
+	write_string(audio);
+	write_short(pitch);
+	message_end();
 }
