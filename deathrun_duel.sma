@@ -14,6 +14,12 @@
 #pragma tabsize 0
 #pragma semicolon 1
 
+//disable knife regen task while duel is active
+#define TASK_REGEN_ID 9321
+
+#define TASK_DUEL_START_ID 6989
+#define TASK_DUEL_PROGRESS_ID 1337
+
 new szSound[] = {"duel/start.wav"};
 new szCountSounds[3][] = {
 	"fvox/one.wav",
@@ -53,6 +59,8 @@ public plugin_init(){
 
 	RegisterHam(Ham_Killed, "player", "player_killed");
 
+	RegisterHam(Ham_TakeDamage, "player", "player_take_damage");
+
 	gCvarDuelTime = register_cvar("duel_time", "60.0");
 
 	register_event("HLTV", "Event_RoundStart", "a", "1=0", "2=0");
@@ -82,8 +90,8 @@ public Event_RoundStart(){
 }
 
 public Event_RoundEnd(){
-	remove_task(1337);
-	remove_task(6989);
+	remove_task(TASK_DUEL_PROGRESS_ID);
+	remove_task(TASK_DUEL_START_ID);
 	fm_set_rendering(gCtId, kRenderFxGlowShell, 0, 0, 0, kRenderNormal, 20);
 	fm_set_rendering(gTerroId, kRenderFxGlowShell, 0, 0, 0, kRenderNormal, 20);
 }
@@ -127,6 +135,14 @@ public player_killed(victim, attacker){
 
 	return HAM_IGNORED;
 }
+
+public player_take_damage(id, inflictor, attacker, Float:damage, damagebits)
+{
+	if(!is_user_connected(attacker) || !duelStarted) return HAM_IGNORED;
+
+	SetHamParamFloat(4, damage);
+	return HAM_HANDLED;
+} 
 
 
 public SetAmmo(id, weaponName, amount){
@@ -303,7 +319,7 @@ public DuelStart(){
 	fm_set_rendering(gCtId, kRenderFxGlowShell, 0, 0, 250, kRenderNormal, 7);
 	fm_set_rendering(gTerroId, kRenderFxGlowShell, 250, 0, 0, kRenderNormal, 7);
 
-	set_task(1.0, "DuelStartHud",6989,_,_, "a", 5);
+	set_task(1.0, "DuelStartHud", TASK_DUEL_START_ID,_,_, "a", 5);
 
 	fm_give_item(gCtId,"CSW_VESTHELM");
 	fm_set_user_health(gCtId,200);
@@ -319,11 +335,17 @@ public DuelStart(){
 
 public DuelStartHud(){
 	if(duelStartTime<=0){
-		set_task(1.0, "DuelHUD",1337,_,_, "a", duelTime);
+		set_task(1.0, "DuelHUD", TASK_DUEL_PROGRESS_ID,_,_, "a", duelTime);
 		set_user_godmode(gCtId, 0);
 		set_user_godmode(gTerroId, 0);
-		remove_task(6989);
+		remove_task(TASK_DUEL_START_ID);
 		play_sound(0, szSound);
+
+		set_user_maxspeed(gCtId, 250.0);
+		set_user_maxspeed(gTerroId, 250.0);
+		
+		set_user_gravity(gCtId, 1.0);
+		set_user_gravity(gTerroId, 1.0);
 
 		return PLUGIN_CONTINUE;
 	}
@@ -342,9 +364,12 @@ public DuelHUD(){
 	if(duelRemainingTime<=0){
 		user_kill(gCtId);
 		user_kill(gTerroId);
-		remove_task(1337);
+		remove_task(TASK_DUEL_PROGRESS_ID);
 	}
-		
+	
+	if(task_exists(TASK_REGEN_ID + gCtId)) remove_task(TASK_REGEN_ID + gCtId);
+	if(task_exists(TASK_REGEN_ID + gTerroId)) remove_task(TASK_REGEN_ID + gTerroId);
+
 	set_hudmessage(200, 0, 0, -1.0, 0.3, 1, 1.0, 1.0, 0.01, 0.01, -1);
 	ShowSyncHudMsg(0, g_msgsync, "Timp ramas pentru duel : %d", duelRemainingTime);
 	duelRemainingTime-=1;
