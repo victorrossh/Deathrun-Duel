@@ -4,7 +4,6 @@
 ### PAWN ###
 # Compiled Bytecode, precompiled output and assembly
 *.amxx
-*.amxx
 *.lst
 *.asm
 
