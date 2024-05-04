@@ -219,12 +219,12 @@ public Menu(id){
 	}
 
 	if(TAlive == 0){
-		CC_SendMessage(id, "%L", id, "DUEL_IF_TERRORIST_ALIVE_MSG");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_TR_ALIVE_MSG");
 		//chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
-	new menu = menu_create( "\rAlege arma!:", "menu_handler" );
+	new menu = menu_create( "\rChoose your weapon!:", "menu_handler" );
 	
 	menu_additem( menu, "\rKnife", "", 0 );
 	menu_additem( menu, "\rDeagle", "", 0 );
@@ -279,7 +279,7 @@ public menu_handler( id, menu, item ){
 	}
 
 	if(TAlive == 0){
-		CC_SendMessage(id, "%L", id, "DUEL_IF_TERRORIST_ALIVE_MSG");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_TR_ALIVE_MSG");
 		//chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
