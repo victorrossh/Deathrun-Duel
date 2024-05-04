@@ -79,6 +79,10 @@ public plugin_init(){
 	CC_SetPrefix("&x04[DR]");
 }
 
+public plugin_cfg() {
+	register_dictionary("deathrun_duel.txt");
+}
+
 public plugin_precache(){
 	precache_sound(szSound);
 	for(new i;i<3;i++)
