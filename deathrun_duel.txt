@@ -1,0 +1,16 @@
+[en]
+DUEL_IF_CT_MSG = You can duel only if you are &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = You can duel only if you are the last &x06CT&x01 alive.
+DUEL_IF_TERRORIST_ALIVE_MSG = You can duel only if there is a &x07Terrorist&x01 alive.
+
+
+[bp]
+DUEL_IF_CT_MSG = Você só pode duelar se for &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Você só pode duelar se for o último &x06CT&x01 vivo.
+DUEL_IF_TERRORIST_ALIVE_MSG = Você só pode duelar se houver um &x07Terrorista&x01 vivo.
+
+[ro]
+
+DUEL_IF_CT_MSG = Poti face duel doar daca esti &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Poti face duel doar daca esti ultimul &x06CT&x01 in viata!
+DUEL_IF_TERRORIST_ALIVE_MSG = Poti face duel numai daca exista un &x07Terorist&x01 in viata!

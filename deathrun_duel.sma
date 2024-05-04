@@ -6,6 +6,7 @@
 #include <hamsandwich>
 #include <engine>
 #include <fun>
+#include <cromchat>
 
 #define PLUGIN "Deathrun Duel"	
 #define VERSION "1.0"
@@ -75,6 +76,7 @@ public plugin_init(){
 
 	g_msgsync = CreateHudSyncObj();
 
+	CC_SetPrefix("&x04[DR]");
 }
 
 public plugin_precache(){
@@ -201,17 +203,20 @@ public Menu(id){
 	gTerroId = players[0];
 
 	if(cs_get_user_team(id) != CS_TEAM_CT){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
 		return PLUGIN_HANDLED;
 	}
 	
 	if(CTAlive != 1 || gCtId != id ){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_LAST_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
 	if(TAlive == 0){
-		chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_TERRORIST_ALIVE_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
@@ -258,17 +263,20 @@ public menu_handler( id, menu, item ){
 	gTerroId = players[0];
 
 	if(cs_get_user_team(id) != CS_TEAM_CT){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
 		return PLUGIN_HANDLED;
 	}
 	
 	if(CTAlive != 1 || gCtId != id ){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_LAST_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
 	if(TAlive == 0){
-		chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_TERRORIST_ALIVE_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 	if ( item == MENU_EXIT )
@@ -392,7 +400,7 @@ stock get_weapon_ent(id,wpnid=0,wpnName[]=""){
 		return fm_find_ent_by_owner(get_maxplayers(),newName,id);
 }
 
-stock chat_color(const id, const input[], any:...){
+/*stock chat_color(const id, const input[], any:...){
 	new iCount = 1;
 	new iPlayers[32];
 
@@ -418,7 +426,7 @@ stock chat_color(const id, const input[], any:...){
 			write_string(sMsg);
 			message_end();
 		}
-}
+}*/
 
 play_sound(id, sound[])
 {
