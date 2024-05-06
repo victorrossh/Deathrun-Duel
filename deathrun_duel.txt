@@ -1,0 +1,65 @@
+[en]
+
+DUEL_IF_CT_MSG = You can duel only if you are &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = You can duel only if you are the last &x06CT&x01 alive.
+DUEL_IF_TR_ALIVE_MSG = You can duel only if there is a &x07Terrorist&x01 alive.
+
+[bp]
+
+DUEL_IF_CT_MSG = Você só pode duelar se for &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Você só pode duelar se for o último &x06CT&x01 vivo.
+DUEL_IF_TR_ALIVE_MSG = Você só pode duelar se houver um &x07Terrorista&x01 vivo.
+
+[ro]
+
+DUEL_IF_CT_MSG = Poti face duel doar daca esti &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Poti face duel doar daca esti ultimul &x06CT&x01 in viata!
+DUEL_IF_TR_ALIVE_MSG = Poti face duel numai daca exista un &x07Terorist&x01 in viata!
+
+[fr]
+
+DUEL_IF_CT_MSG = Vous ne pouvez dueler que si vous êtes &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Vous ne pouvez dueler que si vous êtes le dernier &x06CT&x01 en vie.
+DUEL_IF_TR_ALIVE_MSG = Vous ne pouvez dueler que s'il y a un &x07Terroriste&x01 en vie.
+
+[bg]
+
+DUEL_IF_CT_MSG = Можете да се дуелирате само ако сте &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Можете да се дуелирате само ако сте последният &x06CT&x01, оцелял.
+DUEL_IF_TR_ALIVE_MSG = Можете да се дуелирате само ако има &x07Терорист&x01 на живо.
+
+[es]
+
+DUEL_IF_CT_MSG = Solo puedes dueliar si eres &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Solo puedes dueliar si eres el último &x06CT&x01 vivo.
+DUEL_IF_TR_ALIVE_MSG = Solo puedes dueliar si hay un &x07Terrorista&x01 vivo.
+
+[ru]
+
+DUEL_IF_CT_MSG = Вы можете дуэлировать только если вы &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Вы можете дуэлировать только если вы последний &x06CT&x01, оставшийся в живых.
+DUEL_IF_TR_ALIVE_MSG = Вы можете дуэлировать только если есть &x07Террорист&x01, оставшийся в живых.
+
+[pt]
+
+DUEL_IF_CT_MSG = Você só pode duelar se for &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Você só pode duelar se for o último &x06CT&x01 vivo.
+DUEL_IF_TR_ALIVE_MSG = Você só pode duelar se houver um &x07Terrorista&x01 vivo.
+
+[de]
+
+DUEL_IF_CT_MSG = Du kannst nur duellieren, wenn du &x06CT&x01 bist.
+DUEL_IF_LAST_CT_MSG = Du kannst nur duellieren, wenn du der letzte &x06CT&x01 bist, der noch lebt.
+DUEL_IF_TR_ALIVE_MSG = Du kannst nur duellieren, wenn ein &x07Terrorist&x01 am Leben ist.
+
+[tr]
+
+DUEL_IF_CT_MSG = Yalnızca &x06CT&x01 olduğunuzda düello yapabilirsiniz.
+DUEL_IF_LAST_CT_MSG = Sadece hayatta kalan son &x06CT&x01 olduğunuzda düello yapabilirsiniz.
+DUEL_IF_TR_ALIVE_MSG = Yalnızca bir &x07Terörist&x01 hayatta olduğunda düello yapabilirsiniz.
+
+[hr]
+
+DUEL_IF_CT_MSG = Možete se boriti samo ako ste &x06CT&x01.
+DUEL_IF_LAST_CT_MSG = Možete se boriti samo ako ste posljednji &x06CT&x01 koji je živ.
+DUEL_IF_TR_ALIVE_MSG = Možete se boriti samo ako postoji &x07Terorist&x01 koji je živ.

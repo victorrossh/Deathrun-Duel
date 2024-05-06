@@ -6,6 +6,7 @@
 #include <hamsandwich>
 #include <engine>
 #include <fun>
+#include <cromchat>
 
 #define PLUGIN "Deathrun Duel"	
 #define VERSION "1.0"
@@ -75,6 +76,11 @@ public plugin_init(){
 
 	g_msgsync = CreateHudSyncObj();
 
+	CC_SetPrefix("&x04[FWO]");
+}
+
+public plugin_cfg() {
+	register_dictionary("deathrun_duel.txt");
 }
 
 public plugin_precache(){
@@ -201,21 +207,24 @@ public Menu(id){
 	gTerroId = players[0];
 
 	if(cs_get_user_team(id) != CS_TEAM_CT){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
 		return PLUGIN_HANDLED;
 	}
 	
 	if(CTAlive != 1 || gCtId != id ){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_LAST_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
 	if(TAlive == 0){
-		chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_TR_ALIVE_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
-	new menu = menu_create( "\rAlege arma!:", "menu_handler" );
+	new menu = menu_create( "\r[FWO] \d- \wChoose your weapon:", "menu_handler" );
 	
 	menu_additem( menu, "\rKnife", "", 0 );
 	menu_additem( menu, "\rDeagle", "", 0 );
@@ -258,17 +267,20 @@ public menu_handler( id, menu, item ){
 	gTerroId = players[0];
 
 	if(cs_get_user_team(id) != CS_TEAM_CT){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti !gCT!n.");
 		return PLUGIN_HANDLED;
 	}
 	
 	if(CTAlive != 1 || gCtId != id ){
-		chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_LAST_CT_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel doar daca esti ultimul !gCT!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 
 	if(TAlive == 0){
-		chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
+		CC_SendMessage(id, "%L", id, "DUEL_IF_TR_ALIVE_MSG");
+		//chat_color(id, "!g[DR]!n Poti face duel numai daca exista un !gTerorist!n in viata!n.");
 		return PLUGIN_HANDLED;
 	}
 	if ( item == MENU_EXIT )
@@ -351,7 +363,7 @@ public DuelStartHud(){
 	}
 
 	set_hudmessage(0, 64, 255, -1.0, 0.3, 2, 1.0, 1.0, 0.01, 0.01, -1);
-	ShowSyncHudMsg(0, g_msgsync, "Duelul incepe in : %d", duelStartTime);
+	ShowSyncHudMsg(0, g_msgsync, "Começando o duelo em: %d", duelStartTime);
 	
 	play_sound(0, szCountSounds[duelStartTime-1]);
 	duelStartTime-=1;
@@ -371,7 +383,7 @@ public DuelHUD(){
 	if(task_exists(TASK_REGEN_ID + gTerroId)) remove_task(TASK_REGEN_ID + gTerroId);
 
 	set_hudmessage(200, 0, 0, -1.0, 0.3, 1, 1.0, 1.0, 0.01, 0.01, -1);
-	ShowSyncHudMsg(0, g_msgsync, "Timp ramas pentru duel : %d", duelRemainingTime);
+	ShowSyncHudMsg(0, g_msgsync, "Tempo para o fim do duelo: %d", duelRemainingTime);
 	duelRemainingTime-=1;
 }
 
@@ -392,7 +404,7 @@ stock get_weapon_ent(id,wpnid=0,wpnName[]=""){
 		return fm_find_ent_by_owner(get_maxplayers(),newName,id);
 }
 
-stock chat_color(const id, const input[], any:...){
+/*stock chat_color(const id, const input[], any:...){
 	new iCount = 1;
 	new iPlayers[32];
 
@@ -418,7 +430,7 @@ stock chat_color(const id, const input[], any:...){
 			write_string(sMsg);
 			message_end();
 		}
-}
+}*/
 
 play_sound(id, sound[])
 {
