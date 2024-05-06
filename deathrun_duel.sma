@@ -76,7 +76,7 @@ public plugin_init(){
 
 	g_msgsync = CreateHudSyncObj();
 
-	CC_SetPrefix("&x04[DR]");
+	CC_SetPrefix("&x04[FWO]");
 }
 
 public plugin_cfg() {
@@ -224,7 +224,7 @@ public Menu(id){
 		return PLUGIN_HANDLED;
 	}
 
-	new menu = menu_create( "\rChoose your weapon!:", "menu_handler" );
+	new menu = menu_create( "\r[FWO] \d- \wChoose your weapon:", "menu_handler" );
 	
 	menu_additem( menu, "\rKnife", "", 0 );
 	menu_additem( menu, "\rDeagle", "", 0 );
@@ -363,7 +363,7 @@ public DuelStartHud(){
 	}
 
 	set_hudmessage(0, 64, 255, -1.0, 0.3, 2, 1.0, 1.0, 0.01, 0.01, -1);
-	ShowSyncHudMsg(0, g_msgsync, "Duelul incepe in : %d", duelStartTime);
+	ShowSyncHudMsg(0, g_msgsync, "Começando o duelo em: %d", duelStartTime);
 	
 	play_sound(0, szCountSounds[duelStartTime-1]);
 	duelStartTime-=1;
@@ -383,7 +383,7 @@ public DuelHUD(){
 	if(task_exists(TASK_REGEN_ID + gTerroId)) remove_task(TASK_REGEN_ID + gTerroId);
 
 	set_hudmessage(200, 0, 0, -1.0, 0.3, 1, 1.0, 1.0, 0.01, 0.01, -1);
-	ShowSyncHudMsg(0, g_msgsync, "Timp ramas pentru duel : %d", duelRemainingTime);
+	ShowSyncHudMsg(0, g_msgsync, "Tempo para o fim do duelo: %d", duelRemainingTime);
 	duelRemainingTime-=1;
 }
 
