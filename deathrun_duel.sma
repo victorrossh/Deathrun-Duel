@@ -363,7 +363,8 @@ public DuelStartHud(){
 	}
 
 	set_hudmessage(0, 64, 255, -1.0, 0.3, 2, 1.0, 1.0, 0.01, 0.01, -1);
-	ShowSyncHudMsg(0, g_msgsync, "Começando o duelo em: %d", duelStartTime);
+	//ShowSyncHudMsg(0, g_msgsync, "Começando o duelo em: %d", duelStartTime);
+	ShowSyncHudMsg(0, g_msgsync, "%L", LANG_PLAYER, "DUEL_START_TIME", duelStartTime);
 	
 	play_sound(0, szCountSounds[duelStartTime-1]);
 	duelStartTime-=1;
@@ -383,7 +384,8 @@ public DuelHUD(){
 	if(task_exists(TASK_REGEN_ID + gTerroId)) remove_task(TASK_REGEN_ID + gTerroId);
 
 	set_hudmessage(200, 0, 0, -1.0, 0.3, 1, 1.0, 1.0, 0.01, 0.01, -1);
-	ShowSyncHudMsg(0, g_msgsync, "Tempo para o fim do duelo: %d", duelRemainingTime);
+	//ShowSyncHudMsg(0, g_msgsync, "Tempo para o fim do duelo: %d", duelRemainingTime);
+	ShowSyncHudMsg(0, g_msgsync, "%L", LANG_PLAYER, "DUEL_REMAINING_TIME", duelRemainingTime); 
 	duelRemainingTime-=1;
 }
 
