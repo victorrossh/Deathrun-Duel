@@ -6,7 +6,7 @@
 #include <hamsandwich>
 #include <engine>
 #include <fun>
-#include <cromchat>
+#include <cromchat2>
 
 #define PLUGIN "Deathrun Duel"	
 #define VERSION "1.0"
