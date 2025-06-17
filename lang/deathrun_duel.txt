@@ -5,6 +5,8 @@ DUEL_IF_LAST_CT_MSG = You can duel only if you are the last &x06CT&x01 alive.
 DUEL_IF_TR_ALIVE_MSG = You can duel only if there is a &x07Terrorist&x01 alive.
 DUEL_START_TIME = Starting the duel in: %d
 DUEL_REMAINING_TIME = Time left until the end of the duel: %d
+DUEL_DROP_INSTRUCTIONS = Drop your weapon as far as possible to win the duel.
+DUEL_DROP_DISTANCE = &x03%s &x01dropped the weapon at %.2f units.
 
 [bp]
 
@@ -13,6 +15,8 @@ DUEL_IF_LAST_CT_MSG = Você só pode duelar se for o último &x06CT&x01 vivo.
 DUEL_IF_TR_ALIVE_MSG = Você só pode duelar se houver um &x07Terrorista&x01 vivo.
 DUEL_START_TIME = Começando o duelo em: %d
 DUEL_REMAINING_TIME = Tempo para o fim do duelo: %d
+DUEL_DROP_INSTRUCTIONS = Drope sua arma o mais longe possível para vencer o duelo.
+DUEL_DROP_DISTANCE = &x03%s &x01dropou a arma a %.2f unidades.
 
 [ro]
 
@@ -21,6 +25,8 @@ DUEL_IF_LAST_CT_MSG = Poti face duel doar daca esti ultimul &x06CT&x01 in viata!
 DUEL_IF_TR_ALIVE_MSG = Poti face duel numai daca exista un &x07Terorist&x01 in viata!
 DUEL_START_TIME = Duelul incepe in: %d
 DUEL_REMAINING_TIME = Timp ramas pentru duel: %d
+DUEL_DROP_INSTRUCTIONS = Aruncă-ți arma cât mai departe pentru a câștiga duelul.
+DUEL_DROP_DISTANCE = &x03%s &x01a aruncat arma la %.2f unități.
 
 [fr]
 
@@ -29,6 +35,8 @@ DUEL_IF_LAST_CT_MSG = Vous ne pouvez dueler que si vous êtes le dernier &x06CT&
 DUEL_IF_TR_ALIVE_MSG = Vous ne pouvez dueler que s'il y a un &x07Terroriste&x01 en vie.
 DUEL_START_TIME = Le duel commence dans: %d
 DUEL_REMAINING_TIME = Temps restant jusqu'à la fin du duel: %d
+DUEL_DROP_INSTRUCTIONS = Jetez votre arme le plus loin possible pour gagner le duel.
+DUEL_DROP_DISTANCE = &x03%s &x01a jeté l'arme à %.2f unités.
 
 [bg]
 
@@ -37,6 +45,8 @@ DUEL_IF_LAST_CT_MSG = Можете да се дуелирате само ако 
 DUEL_IF_TR_ALIVE_MSG = Можете да се дуелирате само ако има &x07Терорист&x01 на живо.
 DUEL_START_TIME = Дуелът започва след: %d
 DUEL_REMAINING_TIME = Оставащо време до края на дуела: %d
+DUEL_DROP_INSTRUCTIONS = Хвърлете оръжието си възможно най-далеч, за да спечелите дуела.
+DUEL_DROP_DISTANCE = &x03%s &x01хвърли оръжието на %.2f единици.
 
 [es]
 
@@ -45,6 +55,8 @@ DUEL_IF_LAST_CT_MSG = Solo puedes dueliar si eres el último &x06CT&x01 vivo.
 DUEL_IF_TR_ALIVE_MSG = Solo puedes dueliar si hay un &x07Terrorista&x01 vivo.
 DUEL_START_TIME = El duelo comienza en: %d
 DUEL_REMAINING_TIME = Tiempo restante hasta el final del duelo: %d
+DUEL_DROP_INSTRUCTIONS = Lanza tu arma lo más lejos posible para ganar el duelo.
+DUEL_DROP_DISTANCE = &x03%s &x01lanzó el arma a %.2f unidades.
 
 [ru]
 
@@ -53,14 +65,18 @@ DUEL_IF_LAST_CT_MSG = Вы можете дуэлировать только ес
 DUEL_IF_TR_ALIVE_MSG = Вы можете дуэлировать только если есть &x07Террорист&x01, оставшийся в живых.
 DUEL_START_TIME = Дуэль начнется через: %d
 DUEL_REMAINING_TIME = Оставшееся время до конца дуэли: %d
+DUEL_DROP_INSTRUCTIONS = Бросьте оружие как можно дальше, чтобы выиграть дуэль.
+DUEL_DROP_DISTANCE = &x03%s &x01бросил оружие на %.2f единиц.
 
 [pt]
 
 DUEL_IF_CT_MSG = Você só pode duelar se for &x06CT&x01.
 DUEL_IF_LAST_CT_MSG = Você só pode duelar se for o último &x06CT&x01 vivo.
-DUEL_IF_TR_ALIVE_MSG = Você só pode duelar se houver um &x07Terrorista&x01 vivo.]
+DUEL_IF_TR_ALIVE_MSG = Você só pode duelar se houver um &x07Terrorista&x01 vivo.
 DUEL_START_TIME = Começando o duelo em: %d
 DUEL_REMAINING_TIME = Tempo para o fim do duelo: %d
+DUEL_DROP_INSTRUCTIONS = Drope sua arma o mais longe possível para vencer o duelo.
+DUEL_DROP_DISTANCE = &x03%s &x01dropou a arma a %.2f unidades.
 
 [de]
 
@@ -69,6 +85,8 @@ DUEL_IF_LAST_CT_MSG = Du kannst nur duellieren, wenn du der letzte &x06CT&x01 bi
 DUEL_IF_TR_ALIVE_MSG = Du kannst nur duellieren, wenn ein &x07Terrorist&x01 am Leben ist.
 DUEL_START_TIME = Das Duell beginnt in: %d
 DUEL_REMAINING_TIME = Verbleibende Zeit bis zum Ende des Duells: %d
+DUEL_DROP_INSTRUCTIONS = Wirf deine Waffe so weit wie möglich, um das Duell zu gewinnen.
+DUEL_DROP_DISTANCE = &x03%s &x01hat die Waffe %.2f Einheiten weit geworfen.
 
 [tr]
 
@@ -77,6 +95,8 @@ DUEL_IF_LAST_CT_MSG = Sadece hayatta kalan son &x06CT&x01 olduğunuzda düello y
 DUEL_IF_TR_ALIVE_MSG = Yalnızca bir &x07Terörist&x01 hayatta olduğunda düello yapabilirsiniz.
 DUEL_START_TIME = Düello başlıyor: %d
 DUEL_REMAINING_TIME = Düellonun bitimine kalan süre: %d
+DUEL_DROP_INSTRUCTIONS = Düelloyu kazanmak için silahınızı olabildiğince uzağa atın.
+DUEL_DROP_DISTANCE = &x03%s &x01silahı %.2f birim uzağa attı.
 
 [hr]
 
@@ -85,3 +105,5 @@ DUEL_IF_LAST_CT_MSG = Možete se boriti samo ako ste posljednji &x06CT&x01 koji 
 DUEL_IF_TR_ALIVE_MSG = Možete se boriti samo ako postoji &x07Terorist&x01 koji je živ.
 DUEL_START_TIME = Dvoboj počinje za: %d
 DUEL_REMAINING_TIME = Preostalo vrijeme do kraja dvoboja: %d
+DUEL_DROP_INSTRUCTIONS = Bacite svoje oružje što dalje kako biste pobijedili u dvoboju.
+DUEL_DROP_DISTANCE = &x03%s &x01bacio oružje na %.2f jedinica.

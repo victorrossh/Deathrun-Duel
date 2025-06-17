@@ -7,6 +7,7 @@
 #include <engine>
 #include <fun>
 #include <cromchat2>
+#include <xs>
 
 #define PLUGIN "Deathrun Duel"	
 #define VERSION "1.0"
@@ -20,6 +21,9 @@
 
 #define TASK_DUEL_START_ID 6989
 #define TASK_DUEL_PROGRESS_ID 1337
+
+#define DUEL_TYPE_NORMAL 0
+#define DUEL_TYPE_DROP 1
 
 new szSound[] = {"duel/start.wav"};
 new szCountSounds[3][] = {
@@ -43,12 +47,18 @@ new duelStartTime;
 
 new g_fwDuelWon;
 
+new gDuelType; // Stores the duel type
+new Float:gPlayerPos[33][3]; // Player's position when dropping
+new bool:gPlayerDropped[33]; // Checks if the player dropped
+new Float:gDropDistance[33]; // Drop distance
+new bool:gWeaponLanded[33]; // Checks if the weapon touched the ground
+
 public plugin_init(){
 	register_plugin(PLUGIN,VERSION,AUTHOR);
 
 	register_clcmd("say /duel", "Menu");
 
-	register_clcmd("drop", "BlockDrop");
+	register_clcmd("drop", "HandleDrop");
 
 	RegisterHam(Ham_Player_Jump, "player", "BlockJump");
 
@@ -56,7 +66,7 @@ public plugin_init(){
 
 	RegisterHam( Ham_Touch, "armoury_entity", "BlockPickup" ); 
 
-	RegisterHam( Ham_Touch, "weaponbox", "BlockPickup" );
+	RegisterHam( Ham_Touch, "weaponbox", "WeaponBoxTouch" );
 
 	RegisterHam(Ham_Killed, "player", "player_killed");
 
@@ -93,6 +103,12 @@ public Event_RoundStart(){
 	duelStarted = false;
 	duelRemainingTime = get_pcvar_num(gCvarDuelTime);
 	duelStartTime = 3;
+	gDuelType = DUEL_TYPE_NORMAL;
+	for(new i=1; i<=32; i++) {
+		gPlayerDropped[i] = false;
+		gDropDistance[i] = 0.0;
+		gWeaponLanded[i] = false;
+	}
 }
 
 public Event_RoundEnd(){
@@ -108,6 +124,8 @@ public Event_CurWeapon(id){
 	new ammoCount;
 
 	if(duelStarted){
+		if(gDuelType == DUEL_TYPE_DROP) 
+			return PLUGIN_CONTINUE;
 		if(currWeapon == CSW_KNIFE)
 			return PLUGIN_CONTINUE;
 		if(currAmmo > 3){
@@ -135,7 +153,7 @@ public player_killed(victim, attacker){
 
 	new iReturn;
 
-	if(duelStarted){
+	if(duelStarted && gDuelType == DUEL_TYPE_NORMAL){
 		ExecuteForward( g_fwDuelWon, iReturn, attacker );
 	}
 
@@ -144,7 +162,8 @@ public player_killed(victim, attacker){
 
 public player_take_damage(id, inflictor, attacker, Float:damage, damagebits)
 {
-	if(!is_user_connected(attacker) || !duelStarted) return HAM_IGNORED;
+	if(!is_user_connected(attacker) || !duelStarted || gDuelType == DUEL_TYPE_DROP) 
+		return HAM_IGNORED;
 
 	SetHamParamFloat(4, damage);
 	return HAM_HANDLED;
@@ -152,20 +171,53 @@ public player_take_damage(id, inflictor, attacker, Float:damage, damagebits)
 
 
 public SetAmmo(id, weaponName, amount){
-
 	new weaponEnt = get_weapon_ent(id, weaponName);
 	if(pev_valid(weaponEnt))
 	{
 		cs_set_weapon_ammo(weaponEnt, amount);
 	}
-	
 }
 
-public BlockDrop(id){
-	if(duelStarted){
-		return PLUGIN_HANDLED;
+public HandleDrop(id){
+	if(!duelStarted) 
+		return PLUGIN_CONTINUE;
+	if(gDuelType == DUEL_TYPE_DROP && !gPlayerDropped[id]){
+		pev(id, pev_origin, gPlayerPos[id]);
+		gPlayerDropped[id] = true;
+		gWeaponLanded[id] = false;
+		return PLUGIN_CONTINUE; 
 	}
-	return PLUGIN_CONTINUE;
+	return PLUGIN_HANDLED;
+}
+
+public WeaponBoxTouch(weaponbox, entity){
+	if(!duelStarted || gDuelType != DUEL_TYPE_DROP || !pev_valid(weaponbox)) 
+		return HAM_IGNORED;
+
+	new owner = pev(weaponbox, pev_owner);
+	if(owner != gCtId && owner != gTerroId) 
+		return HAM_IGNORED;
+
+	new Float:velocity[3];
+	pev(weaponbox, pev_velocity, velocity);
+	if(vector_length(velocity) > 0.1) 
+		return HAM_IGNORED; // Weapon still moving
+
+	// Weapon touched the ground and is stationary
+	if(!gWeaponLanded[owner]){
+		new Float:weaponPos[3], ownerName[32];
+		pev(weaponbox, pev_origin, weaponPos);
+		get_user_name(owner, ownerName, 31);
+		gDropDistance[owner] = get_distance_2d(gPlayerPos[owner], weaponPos);
+		CC_SendMessage(0, "%L", LANG_PLAYER, "DUEL_DROP_DISTANCE", ownerName, gDropDistance[owner]);
+		gWeaponLanded[owner] = true; // Mark that the weapon touched the ground
+
+		// Checks if both weapons are on the ground
+		if(gWeaponLanded[gCtId] && gWeaponLanded[gTerroId]){ // Check if both weapons are on the ground
+			DeclareDropDuelWinner();
+		}
+	}
+	return HAM_IGNORED;
 }
 
 public BlockPickup(iEntity, id){
@@ -224,37 +276,64 @@ public Menu(id){
 		return PLUGIN_HANDLED;
 	}
 
+	new title[64];
+	formatex(title, 63, "\r[FWO] \d- \wEscolha o tipo de duelo:");
+	new menu = menu_create(title, "menu_type_handler");
+	
+	menu_additem(menu, "\wDuelo Normal", "1");
+	menu_additem(menu, "\wDuelo de Drop de Armas", "2"); 
+
+	menu_display(id, menu, 0);
+	return 0;
+}
+
+public menu_type_handler(id, menu, item) {
+	if(!is_user_alive(id) || item == MENU_EXIT){
+		menu_destroy(menu);
+		return PLUGIN_HANDLED;
+	}
+
+	switch(item) {
+		case 0: {
+			gDuelType = DUEL_TYPE_NORMAL;
+			ShowWeaponMenu(id);
+		}
+		case 1: {
+			gDuelType = DUEL_TYPE_DROP;
+			ShowWeaponMenu(id);
+		}
+	}
+	menu_destroy(menu);
+	return PLUGIN_HANDLED;
+}
+
+public ShowWeaponMenu(id){
 	new menu = menu_create( "\r[FWO] \d- \wChoose your weapon:", "menu_handler" );
 	
-	menu_additem( menu, "\rKnife", "", 0 );
-	menu_additem( menu, "\rDeagle", "", 0 );
-	menu_additem( menu, "\rMP5", "", 0 );
-	menu_additem( menu, "\rAK47", "", 0 );
-	menu_additem( menu, "\rP90", "", 0 );
-	menu_additem( menu, "\rAUG", "", 0 );
-	menu_additem( menu, "\rScout", "", 0 );
-	menu_additem( menu, "\rM4A1", "", 0 );
-	menu_additem( menu, "\rFamas", "", 0 );
-	menu_additem( menu, "\rShotgun", "", 0 );
-	menu_additem( menu, "\rGrenade", "", 0 );
-	menu_additem( menu, "\rAWP", "", 0 );
-	
-	menu_setprop( menu, MPROP_EXIT, MEXIT_ALL );
-
-	menu_setprop(menu, MPROP_EXITNAME, "EXIT^n^n\r");
-
-	menu_setprop(menu, MPROP_NUMBER_COLOR, "\d");
-	
+	menu_additem( menu, "\wKnife", "", 0 );
+	menu_additem( menu, "\wDeagle", "", 0 );
+	menu_additem( menu, "\wMP5", "", 0 );
+	menu_additem( menu, "\wAK47", "", 0 );
+	menu_additem( menu, "\wP90", "", 0 );
+	menu_additem( menu, "\wAUG", "", 0 );
+	menu_additem( menu, "\wScout", "", 0 );
+	menu_additem( menu, "\wM4A1", "", 0 );
+	menu_additem( menu, "\wFamas", "", 0 );
+	menu_additem( menu, "\wShotgun", "", 0 );
+	menu_additem( menu, "\wGrenade", "", 0 );
+	menu_additem( menu, "\wAWP", "", 0 );
+w
 	menu_display( id, menu, 0 );
-
 	return 0;
 
 }
 
-
 public menu_handler( id, menu, item ){
-	if(!is_user_alive(id))
+	if(!is_user_alive(id) || item == MENU_EXIT){
+		menu_destroy(menu);
 		return PLUGIN_HANDLED;
+	}
+	
 	new players[32];
 	new players2[32];
 	new CTAlive;
@@ -320,8 +399,15 @@ public GiveWeapon(id, weaponName[32]){
 
 	give_item(id, weaponName);
 	engclient_cmd(id, weaponName);
-	if(weaponId != 29)
+	if(weaponId != 29 && gDuelType != DUEL_TYPE_DROP){ 
 		cs_set_user_bpammo(id, weaponId, 999);
+	} else if(gDuelType == DUEL_TYPE_DROP){ // Zero ammo in drop duel
+		new weaponEnt = get_weapon_ent(id, weaponId);
+		if(pev_valid(weaponEnt)){
+			cs_set_weapon_ammo(weaponEnt, 0);
+			cs_set_user_bpammo(id, weaponId, 0);
+		}
+	}
 }
 
 public DuelStart(){
@@ -343,6 +429,12 @@ public DuelStart(){
 
 	set_user_godmode(gCtId, 1);
 	set_user_godmode(gTerroId, 1);
+	gPlayerDropped[gCtId] = false;
+	gPlayerDropped[gTerroId] = false;
+	gDropDistance[gCtId] = 0.0;
+	gDropDistance[gTerroId] = 0.0;
+	gWeaponLanded[gCtId] = false;
+	gWeaponLanded[gTerroId] = false;
 }
 
 public DuelStartHud(){
@@ -358,6 +450,9 @@ public DuelStartHud(){
 		
 		set_user_gravity(gCtId, 1.0);
 		set_user_gravity(gTerroId, 1.0);
+		if(gDuelType == DUEL_TYPE_DROP){
+			CC_SendMessage(0, "%L", LANG_PLAYER, "DUEL_DROP_INSTRUCTIONS");
+		}
 
 		return PLUGIN_CONTINUE;
 	}
@@ -375,8 +470,12 @@ public DuelStartHud(){
 
 public DuelHUD(){
 	if(duelRemainingTime<=0){
-		user_kill(gCtId);
-		user_kill(gTerroId);
+		if(gDuelType == DUEL_TYPE_DROP && gPlayerDropped[gCtId] && gPlayerDropped[gTerroId]){
+			DeclareDropDuelWinner();
+		} else {
+			user_kill(gCtId);
+			user_kill(gTerroId);
+		}
 		remove_task(TASK_DUEL_PROGRESS_ID);
 	}
 	
@@ -387,6 +486,34 @@ public DuelHUD(){
 	//ShowSyncHudMsg(0, g_msgsync, "Tempo para o fim do duelo: %d", duelRemainingTime);
 	ShowSyncHudMsg(0, g_msgsync, "%L", LANG_PLAYER, "DUEL_REMAINING_TIME", duelRemainingTime); 
 	duelRemainingTime-=1;
+}
+
+public DeclareDropDuelWinner(){
+	duelStarted = false;
+	remove_task(TASK_DUEL_PROGRESS_ID);
+	fm_set_rendering(gCtId, kRenderFxGlowShell, 0, 0, 0, kRenderNormal, 20);
+	fm_set_rendering(gTerroId, kRenderFxGlowShell, 0, 0, 0, kRenderNormal, 20);
+	new winner = 0;
+	if(gDropDistance[gCtId] > gDropDistance[gTerroId]){
+		winner = gCtId;
+	} else if(gDropDistance[gTerroId] > gDropDistance[gCtId]){
+		winner = gTerroId;
+	}
+	if(winner){
+		new iReturn;
+		ExecuteForward(g_fwDuelWon, iReturn, winner);
+		user_kill(winner == gCtId ? gTerroId : gCtId);
+	} else {
+		user_kill(gCtId);
+		user_kill(gTerroId);
+	}
+}
+
+public Float:get_distance_2d(Float:pos1[3], Float:pos2[3]){ // Calculates distance only in X and Y
+	return floatsqroot(
+		(pos1[0] - pos2[0]) * (pos1[0] - pos2[0]) +
+		(pos1[1] - pos2[1]) * (pos1[1] - pos2[1])
+	);
 }
 
 stock get_weapon_ent(id,wpnid=0,wpnName[]=""){
